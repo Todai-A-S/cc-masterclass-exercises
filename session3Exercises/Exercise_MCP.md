@@ -1,6 +1,6 @@
 # Exercise: MCP — connect or build
 
-**Duration:** 25 min hands-on + 5 min round-robin
+**Duration:** 30 min hands-on
 **Format:** Two self-selected tracks. Pick one.
 
 ---
@@ -160,12 +160,6 @@ Every time you change the file, restart Claude Code (or run `/mcp reconnect`) so
 ### Step 4: Write down "tasks now possible" (2 min)
 
 Same deliverable as Track A. 3 concrete tasks your new server enables.
-
----
-
-## After the exercise — round-robin
-
-Each pair says one thing out loud: *"The one task I can now do that used to be annoying is: ___"*. 20 seconds per pair. No demo, just the sentence. This feeds the lightning round.
 
 ---
 
