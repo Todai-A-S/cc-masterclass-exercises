@@ -281,8 +281,7 @@ Full docs: https://code.claude.com/docs/en/plugin-marketplaces
 
 - **Just one colleague asking?** Zip or git-clone of the folder.
 - **Whole squad on the same setup?** Local marketplace folder in your squad repo, no central thing to maintain.
-- **Whole engineering org?** Private GitHub repo + auto-install via `extraKnownMarketplaces` in your standard repo template. That's the final form of Rik's "distribution is the real problem."
-
+- **Whole engineering org?** Private GitHub repo + auto-install via `extraKnownMarketplaces` in your standard repo template.
 Today the point is that you understand the *anatomy* and can test locally. Tomorrow you pick the distribution form that fits your team.
 
 ---
@@ -290,7 +289,7 @@ Today the point is that you understand the *anatomy* and can test locally. Tomor
 ## Stretch goals (if you finish early)
 
 1. **Bundle several things.** Put a skill, a hook, and a custom agent into the same plugin. Verify they all load.
-2. **Add an `.mcp.json` to the plugin.** So when someone installs your plugin, they automatically get an MCP server wired up. This is the answer to Rik's "distribution is the real problem" from interview insights.
+2. **Add an `.mcp.json` to the plugin.** So when someone installs your plugin, they automatically get an MCP server wired up.
 3. **Document it.** Write a `README.md` in the plugin root with install instructions and examples. This is the difference between "this is a plugin" and "this is a plugin I actually share with colleagues."
 
 ---
