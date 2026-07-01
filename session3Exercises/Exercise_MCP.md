@@ -17,7 +17,7 @@ Pick this if you have credentials (API keys, tokens) for a system you'd like to 
 ### Track B — Build a tiny one
 Pick this if you don't have credentials for anything, or if you'd rather understand the *anatomy* of an MCP server. You fork a minimal Python template (`mcp-hello-template/`) and modify it to wrap something you have on disk — a JSON file, a local database, a script you run daily, a folder of logs.
 
-**Both tracks end with the same deliverable:** a list of **3 concrete tasks you can now do that were hard or impossible before.** Write them down — we use them in the lightning round afterward.
+**Both tracks end with the same deliverable:** a list of **3 concrete tasks you can now do that were hard or impossible before.**
 
 ---
 
@@ -92,7 +92,7 @@ If you're using Track A on your own ticket system: take a real sprint task or bu
 
 ### Step 4: Write down "tasks now possible" (2 min)
 
-Before we move on, write 3 concrete tasks you can now do that were hard or impossible before. These are what you'll use in the lightning round.
+Before we move on, write 3 concrete tasks you can now do that were hard or impossible before.
 
 ---
 
