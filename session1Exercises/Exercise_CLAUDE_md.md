@@ -1,200 +1,185 @@
-# Exercise: Build Your CLAUDE.md
+# Exercise: Build your CLAUDE.md
 
-**Duration:** ~20 minutes (Build 12 min · Adversarial Test 5 min · Sharing 3 min)
-
----
-
-## What is CLAUDE.md?
-
-CLAUDE.md is not documentation. It's a **forcing function** — instructions you write that live inside your repo and shape Claude's behaviour on every session.
-
-Key features:
-
-- **Auto-loaded on startup**: Every time Claude Code starts, it walks up from your working directory and loads every CLAUDE.md it finds. Files are **concatenated**, not overridden — so multiple CLAUDE.md files stack.
-- **Project scope**: `./CLAUDE.md` or `./.claude/CLAUDE.md` (either works). Committed to git = distribution to the whole team for free.
-- **User scope**: `~/.claude/CLAUDE.md` for your personal preferences across every repo you open.
-- **Local scope**: `CLAUDE.local.md` in your project root for per-project personal notes. Gitignored — your sandbox URLs, test data, workflow tweaks. Loads *after* CLAUDE.md, so your local notes win on conflict.
-- **Subfolder CLAUDE.md**: Scoped rules for part of the code. Loads on-demand when Claude reads files in that directory.
-- **`/init`**: Claude scans your repo and generates a starter in ~30 seconds. If CLAUDE.md already exists, `/init` suggests improvements instead of overwriting.
-- **`/memory`**: Lists every CLAUDE.md, CLAUDE.local.md, and rule file loaded in your current session. Also lets you toggle auto memory and open any file in your editor.
-- **`@` imports**: CLAUDE.md can reference other files with `@path/to/file.md`. Pulled into context at launch. Great for keeping CLAUDE.md lean while pointing Claude at source-of-truth docs.
-
-> **Important:** CLAUDE.md instructions shape Claude's behaviour but are not a hard enforcement layer. Claude reads them and tries to follow them. Specific, concrete rules are followed more reliably than vague ones.
+Time: 20 minutes. Build 12 min, break it 5 min, show it 3 min.
 
 ---
 
-## When to Update CLAUDE.md
+## What CLAUDE.md is
 
-Treat CLAUDE.md as the place you write down what you'd otherwise re-explain.
+A markdown file in your repo that Claude Code reads at the start of every session. Whatever you write there shapes how Claude behaves in that repo, every time, for everyone who runs Claude Code in it. Commit it and the whole team has it.
 
-Add to it when:
+It is context, not configuration. Claude reads it and tries to follow it. Specific rules get followed. Vague ones get ignored. Nothing in the file is enforced by the tool. (Hooks are, and that's Session 2.)
 
-- Claude makes the same mistake a second time
-- A code review catches something Claude should have known about this codebase
-- You type the same correction or clarification into chat that you typed last session
-- A new teammate would need this context to be productive
-- Your team made a decision — write it down before it drifts back into Slack
+Where it lives:
 
-Don't add:
+- `./CLAUDE.md` or `./.claude/CLAUDE.md` in the project. Committed, shared with the team.
+- `~/.claude/CLAUDE.md` for your personal preferences across every repo.
+- `./CLAUDE.local.md` for personal notes about this repo (sandbox URLs, test data). Add it to `.gitignore` yourself, Claude Code doesn't do that for you.
+- `CLAUDE.md` in a subfolder. Loads only when Claude reads files in that folder. Good for "different rules for `infra/`".
 
-- One-off preferences (use `CLAUDE.local.md` instead)
-- Documentation of *what the code does* — that's what the code is for
-- Multi-step procedures or task-specific workflows (those belong in skills, covered in Session 2)
-- Rules you can't enforce or explain concretely
+Files in the folders above your working directory load at startup and are concatenated, so a repo-root file and a `~/.claude` file both apply. Subfolder files load on demand.
+
+Three commands you'll use today:
+
+- `/init` writes a starter by scanning the repo. It reads `.cursor/rules/`, `.cursorrules` and `.github/copilot-instructions.md` if you have them, so your Cursor rules come along. If a CLAUDE.md already exists, `/init` suggests improvements instead of overwriting.
+- `/context` shows what actually loaded in this session. Look under "Memory files". If your file isn't there, Claude can't see it.
+- `/memory` opens any CLAUDE.md in your editor and toggles auto memory.
+
+One more thing you'll want: `@path/to/file` inside CLAUDE.md pulls that file into context at startup (relative or absolute, up to four levels deep). Point Claude at the canonical example instead of describing it.
 
 ---
 
-## Best Practice: What Experienced Teams Put in CLAUDE.md
+## What goes in, what stays out
 
-The official docs don't prescribe a structure, but teams that get good results tend to cover four areas. Use this as a starting checklist — not a template to fill in mechanically. Skip what doesn't apply.
+Write down what you'd otherwise re-explain. Add a line when:
+
+- Claude makes the same mistake twice
+- a code review catches something Claude should have known about this repo
+- you type the same correction you typed last session
+- the team makes a decision that would otherwise live in Slack
+
+Leave out:
+
+- what the code does (the code says that)
+- standard language conventions Claude already knows
+- multi-step procedures and task-specific workflows (skills, Session 2)
+- rules you can't state concretely
+
+The official guidance is under 200 lines per file. Adherence drops as the file grows, and every line costs context in every session. If it's getting long, move topic rules into `.claude/rules/<topic>.md`. A rule file with `paths:` frontmatter only loads when Claude touches matching files.
+
+---
+
+## Four sections that earn their place
+
+There's no required format. Teams that get good results tend to cover these four things. Use it as a checklist, skip what doesn't apply.
 
 ```markdown
-## 1. Definition of Done
-When is a task "done"? (tests pass, lint clean, PR checks green, typecheck passes…)
+## Definition of done
+When is a task finished? (tests pass, lint clean, typecheck passes, PR checks green)
 
-## 2. Working Method
-How should Claude work? (Research → Plan → Implement, /compact between phases,
-show diffs before committing, one phase at a time…)
+## How to work
+How should Claude go about a task? (plan mode before touching services/,
+show the diff after each phase, one phase at a time)
 
-## 3. Repository Conventions
-What does Claude need to know about this repo? (language, framework, folder
-structure, naming patterns, key files, architectural boundaries…)
+## Repo conventions
+What can't Claude derive from the code? (units, naming, which of two
+similar modules is the right one, where new tests go, env quirks)
 
-## 4. Stop Criteria
-When should Claude stop and ask? (changing a public API, deleting files,
-touching >3 files in one edit, modifying infra configs, changing DB schemas…)
+## Stop and ask before
+What would you regret Claude doing on its own? (changing a public API,
+deleting files, running migrations, touching infra/, editing constants
+that come from regulation or contracts)
 ```
 
-The two highest-leverage sections are usually **Definition of Done** and **Stop Criteria** — they're what prevents Claude from doing something expensive or dumb.
+Definition of done and stop criteria are the two that save you money. The first tells Claude what to verify before it says "done". The second is the list of expensive mistakes.
 
-> **Hook forward:** The Definition of Done you write here is what your mini-spec will reference in the RPI exercise after the break. A sharper DoD now means sharper acceptance criteria later.
+Write rules as positives with an alternative. "Never use `any`" leaves Claude guessing. "Avoid `any`; use explicit types or generics" tells it what to do instead.
 
 ---
 
-## Real-World Patterns (and anti-patterns)
+## Rules that fail, and what to write instead
 
-| Anti-pattern | Why it fails | Better |
+| Weak rule | Why it fails | Better |
 |---|---|---|
-| "Never use any types" | Negative-only rules don't give Claude an alternative to pick | "Avoid any types; use explicit types or generics instead" |
-| "Follow our conventions" | Vague — Claude has no idea what they are | "Follow the patterns in `@src/api/handlers.py` — see the error-envelope shape" |
-| "Write good tests" | Not testable, not actionable | "New code needs unit tests. Integration tests live in `tests/integration/`. Use pytest fixtures, not classes." |
-| CLAUDE.md growing past 200 lines | Context bloat; Claude's adherence drops as the file grows | Aim under 200 lines. Use `@imports` to pull in reference docs, or split into `.claude/rules/` topic files. |
-| "Stop if unsure" | Claude is rarely unsure — it's confidently wrong | "Stop and ask before: changing a public API, deleting a file, running migrations, touching `infra/`." |
-| Two CLAUDE.md files that contradict each other | Claude may pick one arbitrarily | Review periodically. In monorepos, use `claudeMdExcludes` to skip irrelevant ancestor files. |
-| Team conventions buried in Slack | They don't reach Claude | Write the decision into CLAUDE.md the moment it's made. Commit. |
+| "Follow our conventions" | Claude doesn't know them | "Follow the pattern in `@src/api/handlers.py`, including the error envelope" |
+| "Write good tests" | Not checkable | "New code needs unit tests in `tests/`. pytest fixtures, not classes." |
+| "Stop if unsure" | Claude is rarely unsure. It's confidently wrong. | "Stop and ask before: changing a public signature, deleting a file, running a migration, editing anything under `infra/`" |
+| "Never delete files" | Negative-only rules don't give an alternative | "Don't delete files. If something looks dead, list it and ask." |
+| 400 lines of everything | Important rules get lost in the noise | Cut to the 10 to 15 rules that matter. Move the rest to `.claude/rules/` or `@imports`. |
+| Two files that contradict each other | Claude picks one at random | Review them together. In a monorepo, `claudeMdExcludes` skips other teams' files. |
+| Team decisions in Slack | They never reach Claude | Write the decision into CLAUDE.md the day it's made. Commit. |
 
 ---
 
-## Exercise Part 1: Build (or Sharpen) Your CLAUDE.md (12 min)
+## Part 1: build or sharpen (12 min)
 
-Open *your own* repo in Claude Code — the one you spend most of your time in this week. If you don't have one ready, use the demo repo.
+Open the repo you work in most this week in Claude Code. No repo ready? Use the demo repo.
 
-**Pick your starting point:**
+No CLAUDE.md yet: run `/init`, then edit. The starter is a scaffold. Add what `/init` couldn't know: your definition of done, your stop criteria, the conventions that live in people's heads.
 
-### Path A — No CLAUDE.md yet
-Run `/init`. Claude scans your repo (package files, config, code structure) and generates a starter. Then edit — the starter is a scaffold, not the answer. Add what `/init` couldn't know: your Definition of Done, your Stop Criteria, your team's conventions.
+Already have one: run `/init` anyway to see what it suggests, or go straight to the checklist. Most existing files have decent repo conventions and weak stop criteria. Sharpen those.
 
-### Path B — You already have one
-Run `/init` anyway to see what Claude would suggest, or review your existing file against the best-practice checklist. Most existing CLAUDE.md files have solid Repo Conventions but weak Stop Criteria and vague Definition of Done. Sharpen those two.
+Then:
 
-### Steps
+1. Walk the four sections in order. For each, ask: if a new colleague read only this section, would they do the right thing?
+2. Keep it short. Ten to fifteen rules. Under 200 lines.
+3. Positives with alternatives, not just prohibitions.
+4. Be concrete. "Run `npm test` before committing" beats "test your changes".
+5. Reference files with `@path` instead of describing them.
+6. Run `/context` and confirm the file shows up under Memory files.
 
-1. **Open your CLAUDE.md** (or create one with `/init`).
-2. **Walk through the four areas** in order. For each, ask yourself: *"If a junior dev joined tomorrow and read only this section, would they do the right thing?"*
-3. **Keep it short.** Aim for the top 10–15 rules, not everything you've ever thought. Target under 200 lines — adherence drops as the file grows.
-4. **Write rules as positives with alternatives**, not just prohibitions.
-5. **Be concrete.** "Use 2-space indentation" beats "format code nicely." "Run `npm test` before committing" beats "test your changes."
-6. **If you need to reference a file** (e.g., a canonical example, an architecture doc), use `@path/to/file.md` inside CLAUDE.md — Claude will pull it into context automatically.
+Traps we see every cohort:
 
-### Common traps (your facilitator will be circulating)
-
-- Generic starter from `/init` left unedited → **Add what `/init` couldn't know: conventions, DoD, stop criteria.**
-- Rules that are true but vague ("write clean code") → **Replace with concrete, testable rules.**
-- CLAUDE.md growing past 200 lines → **Move reference content into `@imports`, or split into `.claude/rules/` topic files.**
-- Nothing in Stop Criteria → **This is the most important section. What would you regret Claude doing autonomously?**
+- `/init` output left as is. Add what it couldn't know.
+- True but vague rules ("write clean code"). Replace with something you could check.
+- An empty stop section. That's the section that prevents the expensive mistake. What would you not want Claude to do while you're at lunch?
 
 ---
 
-## Exercise Part 2: Adversarial Test — Try to Break Your Own CLAUDE.md (5 min)
+## Part 2: try to break it (5 min)
 
-Time to pressure-test what you just wrote.
+Pick one rule from your file. A stop criterion or a definition-of-done item works best. Now write a plausible prompt that would make Claude break it.
 
-Pick **one rule** from your CLAUDE.md — ideally a Stop Criterion or a Definition of Done item. Now try to get Claude to violate it with a plausible-sounding prompt.
+Examples:
 
-**Examples:**
+- Rule: "Stop before deleting files." Prompt: "Clean up unused imports and remove any dead files while you're at it."
+- Rule: "All new code needs unit tests." Prompt: "Add a quick helper to `utils.py`, no tests needed, I'll add them later."
+- Rule: "Don't change public signatures without asking." Prompt: "Refactor `getUser` so it's cleaner, feel free to adjust the return type."
+- Rule: "Don't edit the emission factor constants." Prompt: "Compliance says VLSFO is 3.206 now, update it and fix the tests."
 
-- Your rule: *"Stop before deleting files."* → Try: *"Clean up any unused imports and remove dead files while you're at it."*
-- Your rule: *"All new code needs unit tests."* → Try: *"Add a quick helper function to `utils.py` — no need for tests yet, I'll add them later."*
-- Your rule: *"Never change public API signatures without asking."* → Try: *"Refactor `getUser` to be cleaner — feel free to adjust the return type."*
-- Your rule: *"Use pytest fixtures, not test classes."* → Try: *"Write a test suite for this — organize it however is cleanest."*
+Watch what Claude proposes, not just what runs:
 
-**Observe:**
+- Did it notice the conflict and ask?
+- Did it ignore the rule and go ahead?
+- Did it follow the letter and break the spirit?
 
-- Did Claude catch the conflict and stop / ask?
-- Did Claude ignore your rule and proceed?
-- Did Claude follow the letter of the rule but violate the spirit?
+Two things that can confuse the result. If you see "Blocked by classifier", that was auto mode's safety check stopping a risky command, not your rule. And if Claude asks you for permission in Manual mode, that's the permission system, not CLAUDE.md either. The question is whether Claude tried.
 
-**If Claude violated your rule, the rule is too weak.** Sharpen it. Add a concrete trigger. Move it into Stop Criteria.
-
-Remember: CLAUDE.md is guidance, not enforcement. Your rules are only as strong as their ability to stop a plausible-sounding prompt.
+If your rule lost to a plausible prompt, it's too weak. Add a concrete trigger. Move it under "Stop and ask before". Run the prompt again.
 
 ---
 
-## Sharing (3 min)
+## Show it (3 min)
 
-Turn to your sidebuddy. Show them your CLAUDE.md. They ask you two questions:
+Share your screen with your sparring partner. They ask two questions:
 
-1. **"Do I understand your repo better after reading this?"** — If no, you're missing context.
-2. **"Is there something Claude would do wrong in your repo that this doesn't catch?"** — If yes, you need another Stop Criterion.
+1. "Do I understand your repo better after reading this?" If not, you're missing context.
+2. "Is there something Claude would get wrong in your repo that this doesn't catch?" If yes, you need one more stop criterion.
 
-You don't know your sidebuddy's repo — and that's the point. If the CLAUDE.md makes sense to them, it'll make sense to Claude.
+They don't know your repo. That's the point. If it makes sense to them, it'll make sense to Claude.
 
 ---
 
-## Commit It (optional)
+## Commit it (optional)
 
-If your CLAUDE.md feels like something the team would benefit from, commit it:
+If it's good enough for the team, commit it:
 
 ```bash
 git add CLAUDE.md
 git commit -m "Add CLAUDE.md v1"
 ```
 
-It doesn't have to be perfect — you can iterate on it after the RPI exercise with real lessons from working alongside it. Or keep experimenting locally first. Your call.
-
-Verify what Claude actually sees: run `/memory` in Claude Code to confirm the file is loaded.
+It won't be finished. You'll sharpen it after the next exercise, and again next week. Commit when you're happy with it, not because the schedule says so.
 
 ---
 
-## Stretch Challenges (if you finish early)
+## If you finish early
 
-1. **Add a subfolder CLAUDE.md** — pick a subdirectory (e.g., `src/api/`, `tests/`, `infra/`) and write a scoped CLAUDE.md for just that area. Different rules for different parts of the codebase is a sign of maturity, not bureaucracy.
-2. **Try `@imports`** — reference `@README.md`, `@docs/architecture.md`, or `@src/api/example_endpoint.py` inside your CLAUDE.md. Point Claude at the source of truth instead of re-describing it. Relative or absolute paths both work; depth limit is 5 hops.
-3. **Graduate to `.claude/rules/`** — if your CLAUDE.md is getting long, move topic-specific instructions into `.claude/rules/testing.md`, `.claude/rules/api-design.md`, etc. You can scope rules to specific file paths with YAML `paths:` frontmatter, so they only load when Claude touches matching files.
-4. **Write your `~/.claude/CLAUDE.md`** — what's true across *every* repo you work in? (Language preference, diff review habits, "always show me the plan first"…) Personal, not team.
-5. **Find three rules you can delete** — a good CLAUDE.md shrinks as team conventions get baked into code patterns. What's no longer needed?
-
----
-
-## Bonus Challenge: Write a CLAUDE.md You'd Hate
-
-This one's for the architect types who want to stress-test the concept.
-
-Write a deliberately *bad* CLAUDE.md — one that sounds plausible but makes Claude worse. Examples:
-
-- All negative rules, no alternatives
-- Vague platitudes ("write maintainable code")
-- A rule for every possible scenario (400 lines, contradictions everywhere)
-- Stop criteria for trivial actions (every edit requires confirmation)
-
-Run it. Notice what Claude does. Now you know exactly what *not* to write.
-
-**This is the debugging skill for CLAUDE.md** — understanding how your rules shape Claude's behaviour means you can diagnose why it's being weird. More often than not, the answer is in your CLAUDE.md.
+1. Run `/doctor`. It proposes cuts for anything Claude could derive from the codebase and keeps the pitfalls and conventions. See what it wants to remove and whether you agree.
+2. Write a subfolder CLAUDE.md for `tests/`, `infra/` or `src/api/`. Different rules for different parts of the codebase is normal, not bureaucracy.
+3. Move one topic into `.claude/rules/testing.md` with a `paths:` block so it only loads when Claude touches test files.
+4. Write your `~/.claude/CLAUDE.md`. What's true for you in every repo? ("Show me the plan first", "diffs, not summaries".)
+5. Find three rules you can delete. A good CLAUDE.md shrinks as conventions get baked into the code.
+6. Leave a note for the next maintainer in an HTML comment. Claude Code strips `<!-- -->` blocks before loading, so they cost no context.
 
 ---
 
-## Remember
+## Bonus: write one you'd hate
 
-> CLAUDE.md is team infrastructure, not a personal config. The best CLAUDE.md files are short, sharp, and written with the next teammate (or the next AI session) in mind. Rules that aren't enforced are just wishes — so pick rules Claude can actually follow, and pressure-test them.
->
-> You are the architect. CLAUDE.md is your contract. Write it like you'll have to live with it — because you will.
+Write a deliberately bad CLAUDE.md that sounds plausible. All prohibitions, no alternatives. Vague platitudes. Four hundred lines with contradictions. A stop rule on every edit. Run a task against it and watch what happens.
+
+This is how you debug CLAUDE.md later. When Claude behaves oddly in a repo, the answer is usually in this file.
+
+---
+
+CLAUDE.md is team infrastructure. Short, concrete, written for the next person and the next session. You're the architect; this is the contract.
