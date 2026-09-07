@@ -80,7 +80,6 @@ Ways to steer:
 - Correct it immediately: "No, that function is used for X, not Y. Look at `<file>` instead."
 - Ask for specifics: "Which tests cover this? Which callers would break?"
 - `/btw <question>` asks a side question without adding to the conversation. Handy for "which files did you read?"
-- Hard codebase? Put `ultrathink` in the prompt for that one turn.
 
 Check the findings for three things:
 
@@ -191,15 +190,6 @@ Write a few lines in `context/retro-<task>.md`:
 
 ---
 
-## Plenary
-
-Have one of each ready:
-
-1. The prompt that gave you the most.
-2. The trap that cost you the most time.
-3. The thing that surprised you.
-
----
 
 ## If you finish early
 
