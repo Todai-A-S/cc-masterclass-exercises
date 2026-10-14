@@ -27,6 +27,9 @@ No task ready? Pick one:
 - Tests: a module with no tests. Understand it, plan a test strategy, write the first tests.
 - Refactor: a file everyone avoids. Map its dependencies, plan a safe first step, take it.
 - Onboarding docs: a part of the codebase that's hard to join. Have Claude research it and plan documentation that says something the code doesn't.
+- Slow query: find out why it's slow, plan an index or a rewrite, check it with `EXPLAIN`.
+- Migration: plan it with a rollback, write it, run it against a local copy.
+- Infra: a Terraform change, a pipeline fix or a script. Plan it, write it, dry-run it.
 
 If you're done with the whole workflow in 20 minutes, the task was too small. Take one of the stretch options at the end.
 
@@ -71,6 +74,8 @@ Don't write a plan yet. First research the codebase and tell me:
 
 Keep it to what I need to plan this change.
 ```
+
+Not app code? Swap the bullets for what matters to your change: tables, indexes, rough row counts and who calls the query. Or environments, modules and what depends on them.
 
 Claude will grep, read and summarise. Read the summary as if a new colleague wrote it. Errors here cascade into the plan.
 
@@ -129,7 +134,7 @@ Press `Ctrl+G`. The plan opens in your editor. This is your spec now. Read it an
 - Order: do the phases make sense? Can each be verified on its own?
 - Specific: could you execute phase 1 yourself from what's written?
 - Consistent: does the plan use what the research found, or did Claude drift?
-- Acceptance criteria: could you write a test for each one right now? If not, rewrite it until you could.
+- Acceptance criteria: could you write a test for each one right now? If not, rewrite it until you could. Not every check is a unit test: "`EXPLAIN` uses the new index", "the migration rolls back cleanly on a local copy", "`terraform plan` shows 0 to destroy".
 - Definition of done: does it map to the team's CLAUDE.md, or did Claude invent new criteria?
 
 Save and close. If you'd rather have Claude fix something, choose "No, keep planning" and tell it what to change: "Phase 2 before phase 3, because <reason>. Criterion 3 isn't testable, make it concrete." (In the Desktop app, if `Ctrl+G` doesn't open an editor, review the plan in the session and use "No, keep planning" for every change.)
@@ -171,6 +176,8 @@ While it works:
 - `Esc` stops Claude mid-action. `Esc Esc` opens the rewind menu if you want to go back to before the phase started.
 - If something doesn't fit the plan, say so: "This isn't in the plan. What happened?"
 - Claude executes. It doesn't make new design decisions. If it needs one, it should ask.
+
+Database or infra change? Implement means write it and dry-run it: run the migration against a local copy, run `terraform plan`. Don't apply anything to a shared environment today.
 
 You'll get through phase 1, maybe start phase 2. That's the expected outcome.
 
