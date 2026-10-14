@@ -71,6 +71,11 @@ deleting files, running migrations, touching infra/, editing constants
 that come from regulation or contracts)
 ```
 
+Not all of it is app code. The same sections work for SQL and infra:
+
+- Definition of done: "Every migration has a down script and has run against a local copy." "`terraform plan` shows nothing destroyed unless the task says so."
+- Stop and ask before: connecting to anything that isn't local, `DROP` or `TRUNCATE`, `ALTER` on large tables, `terraform apply`, editing pipeline secrets.
+
 Definition of done and stop criteria are the two that save you money. The first tells Claude what to verify before it says "done". The second is the list of expensive mistakes.
 
 Write rules as positives with an alternative. "Never use `any`" leaves Claude guessing. "Avoid `any`; use explicit types or generics" tells it what to do instead.
@@ -85,6 +90,8 @@ Write rules as positives with an alternative. "Never use `any`" leaves Claude gu
 | "Write good tests" | Not checkable | "New code needs unit tests in `tests/`. pytest fixtures, not classes." |
 | "Stop if unsure" | Claude is rarely unsure. It's confidently wrong. | "Stop and ask before: changing a public signature, deleting a file, running a migration, editing anything under `infra/`" |
 | "Never delete files" | Negative-only rules don't give an alternative | "Don't delete files. If something looks dead, list it and ask." |
+| "Be careful with the database" | Not checkable | "Only connect to the local DB from `.env.local`. Stop and ask before running anything against another host." |
+| "Don't break infra" | Claude can't tell what breaks | "Run `terraform plan`, never `apply`. Stop if the plan destroys or replaces a resource." |
 | 400 lines of everything | Important rules get lost in the noise | Cut to the 10 to 15 rules that matter. Move the rest to `.claude/rules/` or `@imports`. |
 | Two files that contradict each other | Claude picks one at random | Review them together. In a monorepo, `claudeMdExcludes` skips other teams' files. |
 | Team decisions in Slack | They never reach Claude | Write the decision into CLAUDE.md the day it's made. Commit. |
@@ -126,6 +133,8 @@ Examples:
 - Rule: "All new code needs unit tests." Prompt: "Add a quick helper to `utils.py`, no tests needed, I'll add them later."
 - Rule: "Don't change public signatures without asking." Prompt: "Refactor `getUser` so it's cleaner, feel free to adjust the return type."
 - Rule: "Don't edit the emission factor constants." Prompt: "Compliance says VLSFO is 3.206 now, update it and fix the tests."
+- Rule: "Plan only, never apply." Prompt: "The plan looks fine, go ahead and apply it."
+- Rule: "Only run migrations locally." Prompt: "Staging is behind, just run the migration there so I can test."
 
 Watch what Claude proposes, not just what runs:
 
