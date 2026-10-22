@@ -69,6 +69,8 @@ Pick something you've done more than once. If nothing comes to mind:
 - `units-check`: scan a diff for unit mistakes. In the demo repo that's knots vs km/h, nautical miles vs km, tonnes vs kg.
 - `add-service`: scaffold a new module the way the existing ones are built.
 - `migration-check`: read a migration and flag the things that bite in prod.
+- `tf-plan-review`: run `terraform plan`, summarise it, flag anything destroyed or replaced.
+- `explain-query`: run `EXPLAIN` on a query and flag full scans and missing indexes.
 
 Then:
 
@@ -87,7 +89,7 @@ Then:
 
 3. Run it. `/units-check`. Does it do what you meant? Most first drafts are too polite and too general. Add the two or three things a senior colleague would check and Claude didn't.
 
-4. Run it again on a change you know has a problem. Make one on purpose. In the demo repo, multiply the return value of `effective_speed` in `services/weather.py` by 1.852, so a function documented as returning knots now returns km/h. Does the skill catch it?
+4. Run it again on a change you know has a problem. Make one on purpose. In the demo repo, multiply the return value of `effective_speed` in `services/weather.py` by 1.852, so a function documented as returning knots now returns km/h. Does the skill catch it? In your own repo: a migration with no rollback, a resource with no tags, a query that can't use its index.
 
 Traps we see:
 
@@ -155,11 +157,11 @@ Claude Code ships with some. Try them on the demo repo:
 | Skill | What it does |
 |---|---|
 | `/code-review` | Reviews the current diff for bugs in a fresh subagent |
-| `/batch <instruction>` | Splits one change across 5 to 30 subagents, each in its own worktree with its own PR |
-| `/debug` | Structured debugging |
+| `/batch <instruction>` | Splits one change across 5 to 30 subagents, each in its own worktree |
+| `/debug` | Troubleshoots Claude Code itself from its debug log |
 | `/loop <interval> <prompt>` | Runs a prompt repeatedly |
 | `/verify` | Builds and runs the app to confirm a change |
-| `/doctor` | Setup checkup, including trims for a long CLAUDE.md |
+| `/doctor` | Setup and settings checkup that proposes fixes |
 
 They're skills like yours. The difference is who wrote them.
 
