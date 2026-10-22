@@ -65,6 +65,8 @@ Pick a job in your repo that produces output you don't want to read. If nothing 
 - `security-reviewer`: read-only, checks a diff for the OWASP top ten
 - `docs-writer`: reads code, writes to `docs/` only
 - `migration-checker`: reads a migration, reports the risks, changes nothing
+- `plan-reader`: runs `terraform plan`, returns only what gets destroyed or replaced
+- `log-triage`: reads a long log, returns the errors grouped by cause
 
 Ask Claude:
 
@@ -73,6 +75,8 @@ Write a subagent at .claude/agents/test-runner.md. It runs pytest and
 returns only the failing tests with their error messages, nothing else.
 It can run commands and read files but not edit them. Use Sonnet.
 ```
+
+No pytest? Same prompt, your command: `terraform plan`, a migration dry run, a pipeline's log.
 
 Open the file. Check three things:
 
