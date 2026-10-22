@@ -54,6 +54,14 @@ ultracode: review every file changed on this branch for correctness
 issues. Have a second agent verify each finding. Merge into one summary.
 ```
 
+Or for migrations and infra:
+
+```
+ultracode: review every migration in migrations/ for statements that
+lock large tables or can't be rolled back. Verify each finding with
+a second agent. Return one ranked list.
+```
+
 Then:
 
 1. Read the phases in the approval prompt. That's the plan. Say yes.
