@@ -60,13 +60,12 @@ Not a skill: a one-off task. A rule that applies to every session (that's CLAUDE
 
 ## Part 1: a skill you'd use this week (12 min)
 
-Open the repo you work in most. No repo ready? Use the demo repo.
+Open the repo you work in most.
 
 Pick something you've done more than once. If nothing comes to mind:
 
 - `pr-review`: review the current diff against your team's checklist. Missing tests, naming, TODOs, files that should change together.
 - `write-tests`: tests for a file, following the fixtures and patterns your repo already uses.
-- `units-check`: scan a diff for unit mistakes. In the demo repo that's knots vs km/h, nautical miles vs km, tonnes vs kg.
 - `add-service`: scaffold a new module the way the existing ones are built.
 - `migration-check`: read a migration and flag the things that bite in prod.
 - `tf-plan-review`: run `terraform plan`, summarise it, flag anything destroyed or replaced.
@@ -77,19 +76,20 @@ Then:
 1. Ask Claude to write it. Something like:
 
    ```
-   Write a skill called units-check at .claude/skills/units-check/SKILL.md.
-   It reviews the current git diff for unit mismatches and inconsistent
-   naming of units. Look at services/ first to learn which units this
-   repo uses. Read-only. Only I should be able to run it.
+   Write a skill called pr-review at .claude/skills/pr-review/SKILL.md.
+   It reviews the current git diff against our checklist: missing tests,
+   leftover debug code, TODOs, files that should change together. Read
+   the repo first to learn its conventions. Read-only. Only I should be
+   able to run it.
    ```
 
    The last two lines are the header. "Read-only" becomes `allowed-tools`. "Only I should run it" becomes `disable-model-invocation: true`. Say what you want in plain words; Claude knows the field names.
 
 2. Open the file. Read the description. Would you know when to use this skill from that one line? If not, fix it. That line is the one Claude reads every session.
 
-3. Run it. `/units-check`. Does it do what you meant? Most first drafts are too polite and too general. Add the two or three things a senior colleague would check and Claude didn't.
+3. Run it. `/pr-review`. Does it do what you meant? Most first drafts are too polite and too general. Add the two or three things a senior colleague would check and Claude didn't.
 
-4. Run it again on a change you know has a problem. Make one on purpose. In the demo repo, multiply the return value of `effective_speed` in `services/weather.py` by 1.852, so a function documented as returning knots now returns km/h. Does the skill catch it? In your own repo: a migration with no rollback, a resource with no tags, a query that can't use its index.
+4. Run it again on a change you know has a problem. Make one on purpose: a deleted test, a debug print, a migration with no rollback, a resource with no tags. Does the skill catch it?
 
 Traps we see:
 
@@ -132,7 +132,7 @@ Then the useful one. They ask:
 
 ```bash
 git add .claude/skills/
-git commit -m "Add units-check skill"
+git commit -m "Add pr-review skill"
 ```
 
 A skill in the repo is a team tool. A skill in `~/.claude/skills/` is a personal one. Both are fine. Commit when it's good enough for a colleague to run without asking you what it does.
@@ -143,16 +143,16 @@ A skill in the repo is a team tool. A skill in `~/.claude/skills/` is a personal
 
 1. Run `/skill-doctor`. It shows what each skill costs in context and which ones you never use. Check what your new skills cost.
 2. Add `` !`git diff HEAD` `` to the top of your review skill so the diff is there before Claude starts.
-3. Give the skill an argument. `/units-check services/weather.py` with `$ARGUMENTS` in the body to scope the check to one file.
+3. Give the skill an argument. `/pr-review src/api/` with `$ARGUMENTS` in the body to scope the check to one folder.
 4. Try `context: fork` on the review skill. Run it, then run `/context`. The file reads it did are not in your session.
-5. Test it properly. Install the skill-creator plugin with `/plugin install skill-creator@claude-plugins-official`, then ask: "evaluate my units-check skill with skill-creator". It runs your skill on test cases with and without the skill and reports pass rates. Then ask it to tune the description.
+5. Test it properly. Install the skill-creator plugin with `/plugin install skill-creator@claude-plugins-official`, then ask: "evaluate my pr-review skill with skill-creator". It runs your skill on test cases with and without the skill and reports pass rates. Then ask it to tune the description.
 6. Move one section of your CLAUDE.md into a skill with `user-invocable: false`. Knowledge Claude needs sometimes, not every session.
 
 ---
 
 ## Bundled skills
 
-Claude Code ships with some. Try them on the demo repo:
+Claude Code ships with some. Try them on your repo:
 
 | Skill | What it does |
 |---|---|
