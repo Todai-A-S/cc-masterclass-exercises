@@ -22,14 +22,15 @@ Custom ones are a markdown file in `.claude/agents/<name>.md` (the repo) or `~/.
 
 ```markdown
 ---
-name: units-reviewer
-description: Reviews changes for unit mismatches (knots, nautical miles, tonnes). Use after edits in services/.
-tools: Read, Grep, Glob, Bash
+name: migration-checker
+description: Reviews database migrations for risk. Use before merging anything under migrations/.
+tools: Read, Grep, Glob
 model: sonnet
 ---
 
-You review maritime calculation code for unit errors. For each finding,
-give file, line, the two units in conflict, and a fix. Report nothing else.
+You review SQL migrations. Report only statements that lock large tables,
+changes with no rollback, and anything that can lose data.
+Give file, line and a fix. Report nothing else.
 ```
 
 Header fields you'll use: `tools` (or `disallowedTools`), `model` (`sonnet`, `opus`, `haiku`, `fable`, `inherit`), `skills` to preload one of your skills, `memory: project` to give it notes that persist, `isolation: worktree` to give it its own copy of the repo.
@@ -61,10 +62,9 @@ Explore and Plan skip CLAUDE.md too. That's why they're fast.
 Pick a job in your repo that produces output you don't want to read. If nothing comes to mind:
 
 - `test-runner`: runs the suite, returns only failures with the error text
-- `units-reviewer`: the example above
 - `security-reviewer`: read-only, checks a diff for the OWASP top ten
 - `docs-writer`: reads code, writes to `docs/` only
-- `migration-checker`: reads a migration, reports the risks, changes nothing
+- `migration-checker`: the example above
 - `plan-reader`: runs `terraform plan`, returns only what gets destroyed or replaced
 - `log-triage`: reads a long log, returns the errors grouped by cause
 
@@ -101,7 +101,7 @@ Then:
 1. Run `/tasks`. Your subagent is in the list with its model.
 2. Keep working while it runs. Ask Claude something unrelated. That's the background default.
 3. When the result lands, run `/context`. The test output is not in your session. The summary is.
-4. Ask a follow-up: "Continue that run and check only the weather tests." Claude resumes the same subagent with its history intact.
+4. Ask a follow-up: "Continue that run and check only the tests that failed." Claude resumes the same subagent with its history intact.
 
 If Claude can't find the subagent, restart Claude Code. A running session doesn't notice a new `agents` folder.
 
@@ -133,7 +133,7 @@ A skill with `context: fork` in its header is the last row from the other side. 
 
 1. Add `memory: project` to the header. The subagent gets a notes folder at `.claude/agent-memory/<name>/` that survives across sessions. Ask it to save what it learned about your test setup. Next run, it starts with that.
 2. Add `isolation: worktree`. It gets its own copy of the repo. Try a refactor you'd be nervous about in your working tree.
-3. Preload a skill: `skills: [units-check]`. The subagent starts with your checklist in its context instead of discovering it.
+3. Preload a skill: `skills: [pr-review]`. The subagent starts with your checklist in its context instead of discovering it.
 4. Try `/subtask draft tests for the change we just discussed`. Compare what it knows to what the normal subagent knew.
 5. Ask Claude to research three modules in parallel with three subagents. Watch `/tasks` fill up.
 6. Add a `hooks:` block with a `PreToolUse` on `Bash` that blocks anything with `rm`. The hook only runs while this subagent is active.
