@@ -30,9 +30,8 @@ Reach for one when the job is bigger than a handful of subagents, or when you wa
 Put `ultracode` in the prompt, or say "use a workflow". Claude writes the script and shows you the phases before anything runs.
 
 ```
-ultracode: review every file under services/ for unit mismatches
-(knots vs km/h, nautical miles vs km, tonnes vs kg). Verify each
-finding with a second agent before reporting it. Return one ranked list.
+ultracode: review every file changed on this branch for correctness
+issues. Have a second agent verify each finding. Merge into one summary.
 ```
 
 The approval prompt has three options: run it, view the raw script, or no. Ctrl+G opens the script in your editor. In auto mode you see this prompt once and then not again.
@@ -47,14 +46,7 @@ Before you start: `/config workflowSizeGuideline=small`. That tells Claude to ai
 
 Pick a task that reads, not writes. An audit, a review, a search. Save the migration for a day when you're not sharing a screen.
 
-On the demo repo, the units prompt above works. On your own repo:
-
-```
-ultracode: review every file changed on this branch for correctness
-issues. Have a second agent verify each finding. Merge into one summary.
-```
-
-Or for migrations and infra:
+Use the prompt above on your repo. Or for migrations and infra:
 
 ```
 ultracode: review every migration in migrations/ for statements that
