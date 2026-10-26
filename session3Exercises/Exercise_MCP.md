@@ -53,21 +53,21 @@ Same deliverable either way: one line in the chat at the end.
 
 ### Step 1: pick a server (2 min)
 
-GitHub is the default; everyone at ZeroNorth has an account. The token needs `repo` and `read:org`, exported in the shell you start Claude from.
+A database or GitHub are the defaults: everyone has a repo, and the throwaway Postgres below needs nothing but Docker. For GitHub, the token needs `repo` and `read:org`, exported in the shell you start Claude from.
 
 | Server | Good for | Auth | Command (run in your shell) |
 |---|---|---|---|
+| **Postgres, throwaway** | A real SQL query | None | See below |
 | **GitHub** | PRs, issues, code search | Personal access token | `claude mcp add --transport http github https://api.githubcopilot.com/mcp/ --header "Authorization: Bearer $GITHUB_TOKEN"` |
+| **Datadog** | Monitors, logs, metrics | `DD_API_KEY` + `DD_APP_KEY` | https://docs.datadoghq.com/bits_ai/mcp_server/ |
 | **Sentry** | Errors, issues | Browser sign-in | `claude mcp add --transport http sentry https://mcp.sentry.dev/mcp` |
 | **Linear** | Issues, projects | Browser sign-in | `claude mcp add --transport http linear https://mcp.linear.app/mcp` |
 | **Notion** | Docs, databases | Browser sign-in | `claude mcp add --transport http notion https://mcp.notion.com/mcp` |
-| **Datadog** | Monitors, logs, metrics | `DD_API_KEY` + `DD_APP_KEY` | https://docs.datadoghq.com/bits_ai/mcp_server/ |
-| **Postgres, throwaway** | A real SQL query | None | See below |
 | **Anything else** | | | https://registry.modelcontextprotocol.io |
 
 The GitHub server also ships as a plugin: `/plugin install github@claude-plugins-official` does the `claude mcp add` for you. Same server, packaged. Either way works; the command above shows you what's happening.
 
-**Throwaway Postgres**, if you'd rather query a database than a repo:
+**Throwaway Postgres**, the quickest one to try:
 
 ```bash
 docker run --rm -e POSTGRES_PASSWORD=test -p 5432:5432 postgres:16
